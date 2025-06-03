@@ -1,7 +1,7 @@
 
 # Install required libraries before running:
 # pip install pandas geopandas shapely duckdb
-
+ 
 import pandas as pd
 import geopandas as gpd
 from shapely import wkt
