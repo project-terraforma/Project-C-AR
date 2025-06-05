@@ -28,7 +28,7 @@ COPY(                                       -- COPY <query> TO <output> saves th
        CAST(socials AS JSON) as socials,    -- Ensure each attribute can be serialized to JSON
        geometry                             -- DuckDB understands this to be a geometry type
     FROM read_parquet('s3://overturemaps-us-west-2/release/2025-04-23.0/theme=places/type=place/*', filename=true, hive_partitioning=1)
-    WHERE categories.primary IS NOT NULL and confidence > 0.95 -- = 'pizza_restaurant'
+    WHERE categories.primary IS NOT NULL and confidence > 0.70 -- = 'pizza_restaurant'
     AND bbox.xmin BETWEEN -121.91 AND -121.88       -- Only use the bbox min values
     AND bbox.ymin BETWEEN 37.40 AND 37.43         -- because they are point geometries.
 
