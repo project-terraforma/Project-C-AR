@@ -22,9 +22,8 @@ Key Results:
 * Leverage contextual data (e.g., address, metadata, user behavior) to refine 50% of stacked location clusters into more accurate distinct points.
 
 ## Approach 
+During our analysis, we identified that densely populated areas such as shopping malls, small commercial complexes, and local markets often contained multiple stacked POIs. To resolve this, we implemented a spatial unstacking strategy by applying offsets to jitter points away from one another. Using a cKDTree, we were able to look at the points closest to the POI and jitter points away in those locations. This displacement preserved the relative spatial accuracy of these positions, while ensuring that the visual overlap was eliminated, enhancing the map readability and usability. 
 
-## Solutions 
-
-## What Worked 
+To correct POIs positioned in random areas (roadways, water bodies, or open spaces), we introduced a point snapping system. This approach takes contextual data such as the POI's address and metadata, which then snaps the point to the nearest building if the contextual data matches. This snapping algorithm ensures that POIs are not in random locations, improving the readability of the map. 
 
 ## Conclusion 
