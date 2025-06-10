@@ -29,10 +29,11 @@ COPY (
         's3://overturemaps-us-west-2/release/2025-05-21.0/theme=buildings/type=*/*',
         hive_partitioning=1
     )
-    WHERE bbox.xmin > -122.10 AND bbox.xmax < -121.60
-      AND bbox.ymin > 37.10 AND bbox.ymax < 37.45
-) TO 'sanjose_buildings.geojson' (FORMAT GDAL, DRIVER 'GeoJSON');
+    WHERE bbox.xmin > -121.7810 AND bbox.xmax < -121.7790
+      AND bbox.ymin > 37.2930 AND bbox.ymax < 37.2950
+) TO 'buildings.geojson' (FORMAT GDAL, DRIVER 'GeoJSON');
 """)
+
 
 # Run query to extract San Jose POIs to GeoJSON
 con.execute("""
@@ -48,14 +49,24 @@ COPY(
         filename=true,
         hive_partitioning=1
     )
-    WHERE bbox.xmin BETWEEN -122.10 AND -121.60
-      AND bbox.ymin BETWEEN 37.10 AND 37.45
-) TO 'sanjose_pois.geojson' (FORMAT GDAL, DRIVER 'GeoJSON');
+    WHERE bbox.xmin > -121.7810 AND bbox.xmax < -121.7790
+      AND bbox.ymin > 37.2930 AND bbox.ymax < 37.2950
+) TO 'pois.geojson' (FORMAT GDAL, DRIVER 'GeoJSON');
 """)
+print("Data extraction complete. POIs and buildings saved to GeoJSON files.")
 
 # Load and project to meters
-pois = gpd.read_file("sanjose_pois.geojson").to_crs(epsg=32610)
-buildings = gpd.read_file("sanjose_buildings.geojson").to_crs(epsg=32610)
+pois = gpd.read_file("pois.geojson").to_crs(epsg=32610)
+buildings = gpd.read_file("buildings.geojson").to_crs(epsg=32610)
+
+# Exit early if either GeoDataFrame is empty
+if pois.empty:
+    print("No POIs found. Exiting.")
+    exit()
+
+if buildings.empty:
+    print("No buildings found. Exiting.")
+    exit()
 
 # Determine POIs within buildings
 within = gpd.sjoin(pois, buildings, how="left", predicate="within").reset_index()
@@ -121,7 +132,7 @@ final = pd.concat([inside_pois, outside_pois], ignore_index=True)
 final = final.set_geometry("new_geometry").set_crs(epsg=32610).to_crs(epsg=4326)
 final = final.drop(columns=["geometry", "inside_building"]).rename(columns={"new_geometry": "geometry"})
 final = final.set_geometry("geometry")
-final.to_file("snapped_only_outside_pois.geojson", driver="GeoJSON")
+final.to_file("poistobuildings.geojson", driver="GeoJSON")
 
 # Optional: save to Google Drive (uncomment if running in Colab)
 # from google.colab import drive

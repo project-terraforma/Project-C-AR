@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <title>Folium + Leaflet Draw</title>
+        <meta charset="utf-8" />
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+        <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
+        <style>
+            body {
+                margin: 0;
+                padding: 0;
+                font-family: sans-serif;
+                display: flex;
+                flex-direction: column;
+                height: 100vh;
+            }
+            #map {
+                flex: 1;
+            }
+            #footer {
+                padding: 10px;
+                background-color: #f5f5f5;
+                border-top: 1px solid #ccc;
+                text-align: center;
+            }
+            #run-btn {
+                display: inline-block;
+                background-color: white;
+                border: 1px solid #aaa;
+                padding: 8px 12px;
+                cursor: pointer;
+                font-size: 16px;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="map"></div>
+        <div id="footer">
+            <div id="run-btn">▶️ Run Snapping</div>
+        </div>
+
+        <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+        <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+        <script>
+            const map = L.map('map').setView([37.294, -121.78], 18);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19
+            }).addTo(map);
+
+            const drawnItems = new L.FeatureGroup();
+            map.addLayer(drawnItems);
+
+            const drawControl = new L.Control.Draw({
+                draw: {
+                    marker: false,
+                    polyline: false,
+                    polygon: false,
+                    circle: false,
+                    circlemarker: false,
+                    rectangle: true
+                },
+                edit: {
+                    featureGroup: drawnItems
+                }
+            });
+            map.addControl(drawControl);
+
+            let lastBbox = null;
+
+            map.on('draw:created', function (e) {
+                const layer = e.layer;
+                drawnItems.addLayer(layer);
+
+                const bounds = layer.getBounds();
+                const coords = {
+                    xmin: bounds.getWest(),
+                    ymin: bounds.getSouth(),
+                    xmax: bounds.getEast(),
+                    ymax: bounds.getNorth()
+                };
+
+                lastBbox = coords;
+
+                fetch('http://localhost:8000/bbox', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(coords)
+                });
+
+                alert("Sent bounding box to server:\n" + JSON.stringify(coords, null, 2));
+            });
+
+            document.getElementById("run-btn").addEventListener("click", function () {
+                fetch('http://localhost:8000/run', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: "run_snapping" })
+                })
+                .then(res => res.text())
+                .then(data => alert("Snapping triggered:\n" + data))
+                .catch(err => alert("Error triggering snapping:\n" + err));
+            });
+        </script>
+    </body>
+    </html>
+    
