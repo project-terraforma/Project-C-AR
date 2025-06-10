@@ -27,4 +27,17 @@ During our analysis, we identified that densely populated areas such as shopping
 
 To correct POIs positioned in random areas (roadways, water bodies, or open spaces), we introduced a point snapping system. This approach takes contextual data such as the POI's address and metadata, which then snaps the point to the nearest building if the contextual data matches. This snapping algorithm ensures that POIs are not in random locations, improving the readability of the map. 
 
-## Conclusion 
+To use jittering do the following steps: 
+***Open DuckDB in terminal***
+```bash
+$ duckdb
+```
+***Get data from datasets***
+```bash
+$ .read test.sql 
+```
+***Jitter points***
+```bash
+$ python3 offset.py
+```
+Paste the generated file from running offset.py into kepler.gl to see how the points have been jittered. To see how the points were before, paste in the file generated from running test.sql. 
