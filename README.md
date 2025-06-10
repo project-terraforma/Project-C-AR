@@ -2,7 +2,7 @@
 ### By Anshika Agarwal and Ruthwika Gajalla 
 
 ## Problem + Project C
-This quarter, our team chose Project C - (name of project) which focused on enhancing spatial data accuracy of mapped locations. Our main objective was to address issues relation to location correctness - specifically where we resolve spatial stacking, misplacement, and lack of contextual alignment based on the location address, metadata, category, and descriptive tags. Our project aims to reposition POIs and unstack locations to more accurately reflect the real-world spacial layout. 
+This quarter, our team chose Project C - POI Jittering and Snapping which focused on enhancing spatial data accuracy of mapped locations. Our main objective was to address issues relation to location correctness - specifically where we resolve spatial stacking, misplacement, and lack of contextual alignment based on the location address, metadata, category, and descriptive tags. Our project aims to reposition POIs and unstack locations to more accurately reflect the real-world spacial layout. 
 
 ## OKRs 
 OKR #1: 
